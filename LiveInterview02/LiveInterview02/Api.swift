@@ -9,7 +9,7 @@ import Foundation
 
 class Api {
   func getFruits(
-    @escaping completion: (Result<[Fruit], NetworkError>) -> Void
+    completion: @escaping (Result<[Fruit], NetworkError>) -> Void
   ) {
     let urlString = "https://gist.githubusercontent.com/gcbrueckmann/0484975ede56eeb7fba6e143aab7df0f/raw/edfb73c8ade674f40bfff8f3dfed97d327c1abc1/fruits.json"
 
@@ -29,12 +29,18 @@ class Api {
           [Fruit].self,
           from: unwrappedData
         ) {
+          if result.isEmpty {
+            return completion(.failure(.emptyData))
+          }
+
           completion(.success(result))
+        } else {
+          return completion(.failure(.parsingFailed))
         }
       }
     }.resume()
 
-    //return [Fruit]()
+    return completion(.failure(.badResponse))
   }
 }
 
