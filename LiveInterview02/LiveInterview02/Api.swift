@@ -7,9 +7,9 @@
 
 import Foundation
 
-class Api {
+final class Api {
   func getFruits(
-    completion: @escaping (Result<[Fruit], NetworkError>) -> Void
+    completion: @escaping (Result<FruitResponse, NetworkError>) -> Void
   ) {
     let urlString = "https://gist.githubusercontent.com/gcbrueckmann/0484975ede56eeb7fba6e143aab7df0f/raw/edfb73c8ade674f40bfff8f3dfed97d327c1abc1/fruits.json"
 
@@ -24,12 +24,11 @@ class Api {
       if response.statusCode != 200 {
         completion(.failure(.badResponse))
       } else {
-        if let unwrappedData = data,
-          let result = try? JSONDecoder().decode(
-          [Fruit].self,
+        if let unwrappedData = data, let result = try? JSONDecoder().decode(
+          FruitResponse.self,
           from: unwrappedData
         ) {
-          if result.isEmpty {
+          if result.fruits.isEmpty {
             return completion(.failure(.emptyData))
           }
 
@@ -39,9 +38,11 @@ class Api {
         }
       }
     }.resume()
-
-    return completion(.failure(.badResponse))
   }
+}
+
+struct FruitResponse: Codable {
+  var fruits: [Fruit]
 }
 
 enum NetworkError: Error {
