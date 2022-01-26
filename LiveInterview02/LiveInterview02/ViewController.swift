@@ -7,11 +7,12 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UITableViewController {
+  private let api = Api()
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    let api = Api()
     api.getFruits { result in
       switch result {
       case .success(let fruitResponse):
