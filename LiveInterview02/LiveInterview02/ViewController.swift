@@ -21,11 +21,15 @@ class ViewController: UITableViewController {
   }
 
   private func getFruits() {
-    api.getFruits { result in
+    api.getFruits { [weak self] result in
       switch result {
       case .success(let fruitResponse):
-        self.fruits = fruitResponse.fruits
+        self?.fruits = fruitResponse.fruits
         print(fruitResponse.fruits.count)
+
+        DispatchQueue.main.async {
+          self?.tableView.reloadData()
+        }
       case .failure(let error):
         print("Error: \(error)")
       }
@@ -47,7 +51,13 @@ class ViewController: UITableViewController {
     _ tableView: UITableView,
     cellForRowAt indexPath: IndexPath
   ) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "tableViewCell", for: indexPath)
+    let cellIdentifier = "tableViewCell"
+    let cell = tableView.dequeueReusableCell(
+      withIdentifier: cellIdentifier,
+      for: indexPath
+    )
+    cell.textLabel?.text = fruits[indexPath.row].name
+    cell.detailTextLabel?.text = "\(fruits[indexPath.row].price)"
     return cell
   }
 }
